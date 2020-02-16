@@ -1,0 +1,14 @@
+#保存话题信息
+def saveTopic(topicInfo,childInfo):
+    db=psycopg2.connect(host="localhost",user="postgres",password="postgres",database="test")
+    cur=db.cursor()
+    if topicInfo!='':
+        topicSqlStr='insert into crawler.zh_topic_info(topicid,topicname,followers) VALUES '+topicInfo
+        print '  话题：',topicSqlStr
+        cur.execute(topicSqlStr)
+    if childInfo!='':
+        childSqlStr='insert into crawler.zh_topic_childinfo(topicid,child_topicid,child_topicname) values '+childInfo[:-1]
+        print '子话题：',childSqlStr
+        cur.execute(childSqlStr)
+    db.commit()
+    db.close()
