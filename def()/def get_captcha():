@@ -1,0 +1,32 @@
+def get_captcha():
+    """
+    获取验证码本地显示
+    返回你输入的验证码
+    """
+    t = str(int(time.time() * 1000))
+    captcha_url = 'http://www.zhihu.com/captcha.gif?r=' + t + "&type=login"
+    response = session.get(captcha_url, headers=headers)
+    with open('cptcha.gif', 'wb') as f:
+        f.write(response.content)
+    # Pillow显示验证码
+    im = Image.open('cptcha.gif')
+    im.show()
+    captcha = input('本次登录需要输入验证码： ')
+    return captcha
+
+def get_captcha(self):
+    """
+    获取验证码本地显示
+    返回你输入的验证码
+    """
+    t = str(int(time.time() * 1000))
+    captcha_url = 'http://www.zhihu.com/captcha.gif?r=' + t + "&type=login"
+    response = self.session.get(captcha_url, headers=self.headers)
+    with open('cptcha.gif', 'wb') as f:
+        f.write(response.content)
+    # Pillow显示验证码
+    im = Image.open('cptcha.gif')
+    im.show()
+    captcha = input('本次登录需要输入验证码： ')
+    return captcha
+
