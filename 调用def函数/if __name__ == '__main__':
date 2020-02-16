@@ -1,16 +1,73 @@
 if __name__ == '__main__':
+    '''
+    #driver 解决方案 [WebDriverException:] https://www.cnblogs.com/buchiany/p/6379305.html
+    Edgedriver = "C:\Program Files (x86)\Microsoft\Edge\Application\msedgedriver" 
+    #driver = webdriver.Chrome(chromedriver)
+    driver = webdriver.Edge(Edgedriver)
+    wait = ui.WebDriverWait(driver,10)
+    driver.get('https://www.zhihu.com/login/email')
+    driver.get('https://www.zhihu.com/signin?next=%2F')
+    #wait.until(lambda driver: driver.find_element_by_方法("定位路径自己来"))
+    driver.find_element_by_css_selector('[href="#signin"]').click()
+    driver.find_element_by_css_selector('[class="signin-switch-password"]').click()
+    driver.find_element_by_xpath("//input[@name='account']").send_keys('19956070324')
+    driver.find_element_by_xpath("//input[@name='password']").send_keys('hukunyu9985434')
+    time.sleep(5)  # 手动输入验证码
+    driver.find_element_by_xpath("//button[@class='sign-button submit']").click()
+    time.sleep(2)  # 等待页面跳转
+    cookies = driver.get_cookies()
+    for cookie in cookies:
+        session.cookies.set(cookie['name'],cookie['value'])
+        if cookie['name']=='_xsrf':
+            xsrf=cookie['value']
+    headers = {
+    "Host": "www.zhihu.com",
+    "Referer": "https://www.zhihu.com/",
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:55.0) Gecko/20100101 Firefox/55.0',
+}
+    '''
+    
+    
     #调用class():
     spider = ZhiHuSpider()
+    spider.crawl(topic_id=xupt_topic_id)
+    spider.saveMysql()
     
-    #调用并判断isLogin():
+    #验证Cookie加载
+    __init__()
+    session = requests.Session()
+    session = requests.Session()
+    #调用并判断isLogin():  验证是否登录成功
     if spider.isLogin():
         print('您已经登录')
     else:
         account = input('输入账号：')
         secret = input('输入密码：')
         spider.login(account, secret)
+        
+    #话题抓取主体程序
     
+    topicid=285596045  #定义初始话题编号
+    crawedCount=0  #定义初始已抓取数量
+    proxyip=''
+    while getPendingTopic():
+        print('----------本次已抓取话题数：',crawedCount,'个；当前主题ID为：',topicid,'代理IP地址为:',proxyip,'------------')
+        try:
+            str1,str2,str3=getTopic(topicid,proxyip)
+            saveTopic(str1,str2,str3)
+        except Exception:
+            #print 'traceback.format_exc():\n%s' % traceback.format_exc()
+            # proxyip=getProxies()使用代理IP地址
+            continue
+        time.sleep(random.randint(0,1))#控制爬取速度
+        crawedCount=crawedCount+1#已抓取话题计数
+        
     #调用getQsAnswer()：
+    global questionId
+    questionId=369097579#定义提问话题编号
+    crawedCount=0#定义初始已抓取回答数量
     spider.getQsAnswer('39162814')
     spider.getQsAnswer('369097579')
+    time.sleep(random.randint(0,1))#控制爬取速度
+    crawedCount=crawedCount+1#已抓取回答计数
 
