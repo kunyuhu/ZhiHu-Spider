@@ -1,0 +1,24 @@
+import re
+from bs4 import BeautifulSoup
+import http.cookiejar
+import requests
+
+#获取动态代理IP
+def getProxies():
+  page = requests.get("http://www.xicidaili.com/nn", 
+                      headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5)'}
+                      )
+  soup = BeautifulSoup(page.text, 'lxml')
+
+  taglist = soup.find_all('tr', attrs={'class': re.compile("(odd)|()")})
+  for trtag in taglist:
+      tdlist = trtag.find_all('td')
+      proxy = {'http': 'http://'+tdlist[1].string + ':' + tdlist[2].string,
+           'https': 'http://'+tdlist[1].string + ':' + tdlist[2].string}
+      url = "http://ip.chinaz.com/getip.aspx"  #用来测试IP是否可用的url
+      try:
+          requests.get(url, proxies=proxy, timeout=5)#测试IP是否可用
+          print(proxy) #IP可用
+      except Exception:
+          print("proxy_out")  #未获得IP
+          continue
