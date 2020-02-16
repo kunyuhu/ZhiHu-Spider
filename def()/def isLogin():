@@ -1,0 +1,11 @@
+def isLogin():
+    # 通过查看用户个人信息来判断是否已经登录
+    url = "https://www.zhihu.com/settings/profile"
+    # 禁止重定向，否则登录失败重定向到首页也是响应200
+    login_code = session.get(url, headers=headers, allow_redirects=False).status_code
+    if login_code == 200:
+        print('登录成功')
+        return True
+    else:
+        print('还未登录')
+        return False
