@@ -1,0 +1,21 @@
+def getTopic(topicId,proxyip):
+    url = 'https://www.zhihu.com/topic/'+str(topicId)+'/organize'
+    html= session.get(url, headers=headers,proxies=proxyip,timeout=10)
+    soup=BeautifulSoup(html.text)
+
+    #get话题关注人数
+    if soup.find(class_='zm-topic-side-followers-info').strong is None: #存在关注者为0的情况
+        topicinfo='('+str(topicId)+',\''+topicName+'\',0)'
+    else:
+        fellower=soup.find(class_='zm-topic-side-followers-info').strong.string
+        topicinfo='('+str(topicId)+',\''+topicName+'\','+str(fellower)+')'#话题信息字符串
+
+    #get子话题数据
+    child_topic_list=soup.find(id='zh-topic-organize-child-editor')
+    child_topics=child_topic_list.find_all(class_='zm-item-tag')
+    child_topicinfo=''
+    for child_topic in child_topics:
+        child_topicid=child_topic.get('data-token')
+        child_topicname=child_topic.get_text().replace('\n','').replace('\'','')
+        child_topicinfo=child_topicinfo+'('+str(topicId)+','+str(child_topicid)+',\''+child_topicname+'\'),'#子话题信息字符串
+    return topicinfo,child_topicinfo
