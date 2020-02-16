@@ -1,0 +1,10 @@
+def get_xsrf(self):
+    """
+    获取参数_xsrf
+    """
+    response = self.session.get('https://www.zhihu.com', headers=self.headers)
+    html = response.text
+    get_xsrf_pattern = re.compile(r'<input type="hidden" name="_xsrf" value="(.*?)"')
+    _xsrf = re.findall(get_xsrf_pattern, html)[0]
+
+    return _xsrf
