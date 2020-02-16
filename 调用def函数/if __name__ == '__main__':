@@ -1,4 +1,6 @@
 if __name__ == '__main__':
+    print('开始爬取:',datetime.datetime.now())
+    
     '''
     #driver 解决方案 [WebDriverException:] https://www.cnblogs.com/buchiany/p/6379305.html
     Edgedriver = "C:\Program Files (x86)\Microsoft\Edge\Application\msedgedriver" 
@@ -70,4 +72,7 @@ if __name__ == '__main__':
     spider.getQsAnswer('369097579')
     time.sleep(random.randint(0,1))#控制爬取速度
     crawedCount=crawedCount+1#已抓取回答计数
+    
+    print('爬取完毕',datetime.datetime.now())
+
 
