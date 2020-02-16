@@ -1,0 +1,45 @@
+# 将爬取到的评论存入数据库中
+def saveMysql(self):
+    """
+    :return: True / False  (存入数据库操作完成 / 失败)
+    """
+    table = 'comment'
+    drop_sql = "DROP TABLE IF EXISTS {table}".format(table=table)
+    create_sql = "CREATE TABLE IF NOT EXISTS {table}(comment_id int PRIMARY KEY AUTO_INCREMENT, q_title varchar(255), content text)CHARSET='utf8';".format(
+        table=table)
+
+    data = []
+    for i in range(len(self.comments)):
+        data_unit = {
+            'q_title': self.comments[i][0],
+            'content': self.comments[i][1]
+        }
+        data.append(data_unit)
+
+    keys = ','.join(data[0].keys())
+    values = ','.join(['%s'] * len(data[0]))
+    insert_sql = 'INSERT INTO {table}({keys}) VALUES ({values})'.format(table=table, keys=keys, values=values)
+
+    try:
+        # 连接数据库
+        db = pymysql.connect(host="127.0.0.1", user="root", password="123456789",
+                             database="DataPlatform", port=3306)
+        cursor = db.cursor()
+        db.autocommit(False)
+
+        # cursor.execute(drop_sql)  # 删表, 测试时使用，看个人需求
+        cursor.execute(create_sql)
+        for i in range(len(self.comments)):
+            cursor.execute(insert_sql, tuple(data[i].values()))
+
+        # 提交到数据库并执行
+        db.commit()
+        db.autocommit(True)
+
+    except Exception as e:
+        print(e)
+        # 发生错误时回滚
+        db.rollback()
+
+    finally:
+        db.close()
