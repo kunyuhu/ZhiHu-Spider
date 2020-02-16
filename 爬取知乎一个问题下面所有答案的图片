@@ -1,0 +1,37 @@
+import requests
+from bs4 import BeautifulSoup
+import json
+import time
+import uuid
+import datetime
+import os
+#找到网站的答案的真实地址，并下载其data，然后从data中找到图片的下载地址，并将其下载到本地。其中offset表示从第几条回答开始请求，后面会用来循环。sort表示回答的排列顺序
+def download(offset,sort):
+#将传入的offset字符串化
+    offset=str(offset)
+#url中设置两个变量，offset和sort
+    url='https://www.zhihu.com/api/v4/questions/34243513/answers?include=data%5B%2A%5D.is_normal%2Cadmin_closed_comment%2Creward_info%2Cis_collapsed%2Cannotation_action%2Cannotation_detail%2Ccollapse_reason%2Cis_sticky%2Ccollapsed_by%2Csuggest_edit%2Ccomment_count%2Ccan_comment%2Ccontent%2Ceditable_content%2Cvoteup_count%2Creshipment_settings%2Ccomment_permission%2Ccreated_time%2Cupdated_time%2Creview_info%2Crelevant_info%2Cquestion%2Cexcerpt%2Crelationship.is_authorized%2Cis_author%2Cvoting%2Cis_thanked%2Cis_nothelp%2Cis_labeled%2Cis_recognized%2Cpaid_info%2Cpaid_info_content%3Bdata%5B%2A%5D.mark_infos%5B%2A%5D.url%3Bdata%5B%2A%5D.author.follower_count%2Cbadge%5B%2A%5D.topics&limit=5&offset='+offset+'&platform=desktop&sort_by='+sort
+    html=requests.get(url=url,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18363'}).text
+    res=json.loads(html)
+#创建一个文件夹用来存储
+    if not os.path.exists('download1'):
+        os.mkdir('download1')
+#因为list不能用字符串来索引，所以用enumerate创造一个可以遍历的索引序列
+    for i,item in enumerate(res['data']):
+#找到所有的图片下载地址标签
+        content=BeautifulSoup(item['content'],'lxml')
+        imgurls=content.select('noscript img')
+#挨个获取图片下载地址和图片的格式，并将其保存到本地文件夹中
+        for imgurl in imgurls:
+            src=imgurl['src']
+            img=src[src.rfind('.'):]
+            with open(f'download1/{uuid.uuid4()}{img}','wb') as f:
+                f.write(requests.get(src).content)
+#因为知乎的offset是5，这里设置了一个循环，获得15个回答的所有图片
+if __name__=='__main__':
+    print('开始爬取:',datetime.datetime.now())
+    for i in range(3):
+        download(offset=((i*5)if i!=0 else 0),sort='default')
+        time.sleep(3)
+    download('5','default')
+    print('爬取完毕',datetime.datetime.now())
