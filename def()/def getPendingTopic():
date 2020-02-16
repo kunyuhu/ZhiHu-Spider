@@ -1,0 +1,15 @@
+#获取待抓取话题id
+def getPendingTopic():
+    global topicid
+    db=psycopg2.connect(host="localhost",user="postgres",password="postgres",database="test")
+    cur=db.cursor()
+    cur.execute('SELECT childtopic FROM crawler.get_child_topic_uncraw()')
+    topic=cur.fetchall()
+    # 判断是否还有话题未抓取
+    if len(topic)>0:
+        topicid=topic[0][0]
+        return True
+    else:
+        topicid=0
+        print '所有话题抓取完毕！'
+        return False
